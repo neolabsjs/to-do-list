@@ -10,9 +10,9 @@ class TaskService {
   }
 
   create = async (title, deadline) => {
-    const exist = this.findOne({ title })
+    const exist = await TaskModel.findOne({ title })
     if (exist) {
-      throw new Error()
+      throw new Error('Task already exist')
     }
     const task = new TaskModel({
       title, deadline
@@ -20,8 +20,22 @@ class TaskService {
     return await task.save()
   }
 
-  update = async () => {}
-  delete = async () => {}
+  update = async (id, dto) => {
+    const task = await TaskModel.findById(id)
+    if (!task) {
+      throw new Error('Task is not defined')
+    }
+    Object.assign(task, dto)
+    return await task.save()
+  }
+
+  delete = async (id) => {
+    try {
+      await TaskModel.findByIdAndDelete(id)
+    } catch (e) {
+      throw new Error('Task is not defined')
+    }
+  }
 }
 
 const taskService = new TaskService()
